@@ -10,5 +10,3 @@ dnspython
 
 # --- For-Web-Response ------- #
 aiohttp
-Flask
-gunicorn
