@@ -1,4 +1,4 @@
-#(©)NGXBOTZ
+#(©)Codexbotz
 
 import base64
 import re
@@ -9,6 +9,9 @@ from pyrogram.enums import ChatMemberStatus
 from config import FORCE_SUB_CHANNEL, ADMINS, AUTO_DELETE_TIME, AUTO_DEL_SUCCESS_MSG
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant
 from pyrogram.errors import FloodWait
+
+# ----- ADDED: cache to prevent double sends -----
+processed_message_ids = set()
 
 async def is_subscribed(filter, client, update):
     if not FORCE_SUB_CHANNEL:
@@ -33,7 +36,7 @@ async def encode(string):
     return base64_string
 
 async def decode(base64_string):
-    base64_string = base64_string.strip("=") # links generated before this commit will be having = sign, hence striping them to handle padding errors.
+    base64_string = base64_string.strip("=")
     base64_bytes = (base64_string + "=" * (-len(base64_string) % 4)).encode("ascii")
     string_bytes = base64.urlsafe_b64decode(base64_bytes) 
     string = string_bytes.decode("ascii")
@@ -55,7 +58,7 @@ async def get_messages(client, message_ids):
                 chat_id=client.db_channel.id,
                 message_ids=temb_ids
             )
-        except Exception as e:  # <- changed from bare except
+        except Exception as e:
             print(f"Error getting messages: {e}")
             msgs = []
         total_messages += len(temb_ids)
@@ -63,29 +66,32 @@ async def get_messages(client, message_ids):
     return messages
 
 async def get_message_id(client, message):
+    global processed_message_ids
+    msg_id = 0
     if message.forward_from_chat:
         if message.forward_from_chat.id == client.db_channel.id:
-            return message.forward_from_message_id
-        else:
-            return 0
+            msg_id = message.forward_from_message_id
     elif message.forward_sender_name:
         return 0
     elif message.text:
         pattern = r"https://t.me/(?:c/)?(.*)/(\d+)"
-        matches = re.search(pattern, message.text)  # <- changed from re.match
-        if not matches:
-            return 0
-        channel_id = matches.group(1)
-        msg_id = int(matches.group(2))
-        if channel_id.isdigit():
-            if f"-100{channel_id}" == str(client.db_channel.id):
-                return msg_id
-        else:
-            if channel_id == client.db_channel.username:
-                return msg_id
-        return 0  # <- ensure 0 is returned if no valid match
-    else:
+        matches = re.search(pattern, message.text)
+        if matches:
+            channel_id = matches.group(1)
+            m_id = int(matches.group(2))
+            if channel_id.isdigit():
+                if f"-100{channel_id}" == str(client.db_channel.id):
+                    msg_id = m_id
+            else:
+                if channel_id == client.db_channel.username:
+                    msg_id = m_id
+
+    # ----- ADDED: check if message ID was already processed -----
+    if msg_id in processed_message_ids:
         return 0
+    if msg_id != 0:
+        processed_message_ids.add(msg_id)
+    return msg_id
 
 def get_readable_time(seconds: int) -> str:
     count = 0
@@ -110,7 +116,8 @@ def get_readable_time(seconds: int) -> str:
 
 async def delete_file(messages, client, process):
     await asyncio.sleep(AUTO_DELETE_TIME)
-    for msg in messages:
+    unique_messages = {msg.id: msg for msg in messages}.values()  # prevent double delete
+    for msg in unique_messages:
         try:
             await client.delete_messages(chat_id=msg.chat.id, message_ids=[msg.id])
         except Exception as e:
@@ -118,6 +125,5 @@ async def delete_file(messages, client, process):
             print(f"The attempt to delete the media {msg.id} was unsuccessful: {e}")
 
     await process.edit_text(AUTO_DEL_SUCCESS_MSG)
-
 
 subscribed = filters.create(is_subscribed)
