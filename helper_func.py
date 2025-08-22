@@ -1,4 +1,4 @@
-#(©)Codexbotz
+#(©)NGXBOTZ
 
 import base64
 import re
@@ -55,8 +55,9 @@ async def get_messages(client, message_ids):
                 chat_id=client.db_channel.id,
                 message_ids=temb_ids
             )
-        except:
-            pass
+        except Exception as e:  # <- changed from bare except
+            print(f"Error getting messages: {e}")
+            msgs = []
         total_messages += len(temb_ids)
         messages.extend(msgs)
     return messages
@@ -70,8 +71,8 @@ async def get_message_id(client, message):
     elif message.forward_sender_name:
         return 0
     elif message.text:
-        pattern = "https://t.me/(?:c/)?(.*)/(\d+)"
-        matches = re.match(pattern,message.text)
+        pattern = r"https://t.me/(?:c/)?(.*)/(\d+)"
+        matches = re.search(pattern, message.text)  # <- changed from re.match
         if not matches:
             return 0
         channel_id = matches.group(1)
@@ -82,6 +83,7 @@ async def get_message_id(client, message):
         else:
             if channel_id == client.db_channel.username:
                 return msg_id
+        return 0  # <- ensure 0 is returned if no valid match
     else:
         return 0
 
@@ -112,7 +114,7 @@ async def delete_file(messages, client, process):
         try:
             await client.delete_messages(chat_id=msg.chat.id, message_ids=[msg.id])
         except Exception as e:
-            await asyncio.sleep(e.x)
+            await asyncio.sleep(getattr(e, "x", 1))
             print(f"The attempt to delete the media {msg.id} was unsuccessful: {e}")
 
     await process.edit_text(AUTO_DEL_SUCCESS_MSG)
