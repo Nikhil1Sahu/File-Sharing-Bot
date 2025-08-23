@@ -33,7 +33,7 @@ DB_NAME = os.environ.get("DATABASE_NAME", "Cluster0")
 FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL")
 JOIN_REQUEST_ENABLE = os.environ.get("JOIN_REQUEST_ENABLED", "True")
 
-TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
+TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "3"))
 
 #start message
 START_PIC = os.environ.get("START_PIC","https://envs.sh/uxs.jpeg")
