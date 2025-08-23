@@ -31,7 +31,7 @@ DB_NAME = os.environ.get("DATABASE_NAME", "Cluster0")
 
 # Force sub channel IDs (must be integers, not usernames)
 # Use your actual channel IDs here
-FORCE_SUB_CHANNEL = [-1002626576851, -1001896738912]
+FORCE_SUB_CHANNEL = ["https://t.me/manhwa_kingdom", "https://t.me/Anime_Of_Kingdom"]
 
 # Convert JOIN_REQUEST_ENABLE to boolean
 JOIN_REQUEST_ENABLE = os.environ.get("JOIN_REQUEST_ENABLED", "True").lower() == "true"
