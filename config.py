@@ -32,7 +32,7 @@ DB_NAME = os.environ.get("DATABASE_NAME", "Cluster0")
 # Force sub channel IDs (must be integers, not usernames)
 # Use your actual channel IDs here
 # Read force sub channels as URLs
-FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL", "https://t.me/manhwa_kingdom https://t.me/Anime_Of_Kingdom").split()
+FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL", "@manhwa_kingdom @Anime_Of_Kingdom").split()
 
 # Join request boolean
 JOIN_REQUEST_ENABLE = os.environ.get("JOIN_REQUEST_ENABLE", "False").lower() == "true"
