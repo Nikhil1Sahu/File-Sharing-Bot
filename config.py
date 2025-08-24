@@ -33,7 +33,7 @@ DB_NAME = os.environ.get("DATABASE_NAME", "Cluster0")
 # ===================== Force Sub Config =====================
 # List of channel usernames or URLs separated by space in .env
 FORCE_SUB_CHANNEL = os.environ.get("FORCE_SUB_CHANNEL", "@manhwa_kingdom")
-JOIN_REQUEST_ENABLE = os.environ.get("JOIN_REQUEST_ENABLED", "True") == "true" else false
+JOIN_REQUEST_ENABLE = os.environ.get("JOIN_REQUEST_ENABLED", "True") == "true"
 
 # ===================== Bot Workers =====================
 TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "3"))
@@ -65,7 +65,7 @@ FORCE_MSG = os.environ.get(
 
 # ===================== Other Bot Config =====================
 CUSTOM_CAPTION = os.environ.get("CUSTOM_CAPTION", None)
-PROTECT_CONTENT = os.environ.get("PROTECT_CONTENT", "False") == "true" else false
+PROTECT_CONTENT = os.environ.get("PROTECT_CONTENT", "False") == "true"
 AUTO_DELETE_TIME = int(os.environ.get("AUTO_DELETE_TIME", "180"))
 AUTO_DELETE_MSG = os.environ.get(
     "AUTO_DELETE_MSG",
